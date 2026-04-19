@@ -1,0 +1,25 @@
+﻿# Visual Studio files
+.vs/
+*.vcxproj.user
+
+*.sdf
+*.suo
+*.ipch
+*.obj
+*.pch
+*.db
+*.opendb
+*.tlog
+*.lastbuildstate
+*.log
+*.cs
+*.json
+*.rs
+
+# Build output
+x64/
+Debug/
+Release/
+
+# ImGui configuration
+imgui.ini

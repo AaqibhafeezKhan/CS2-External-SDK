@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Beginner External - Premium Learning Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+        .glow-text {
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+        .neon-btn {
+            background: linear-gradient(45deg, #00f2fe 0%, #4facfe 100%);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+        .neon-btn:hover {
+            box-shadow: 0 4px 25px rgba(0, 242, 254, 0.5);
+        }
+        .animated-bg {
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="animated-bg"></div>
+
+    <nav class="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
+        <div class="text-2xl font-bold tracking-tighter text-cyan-400 glow-text">CS2 EXTERNAL</div>
+        <div class="space-x-8 text-gray-400 font-medium hidden md:block">
+            <a href="#features" class="hover:text-white transition">Features</a>
+            <a href="#dev" class="hover:text-white transition">Development</a>
+            <a href="https://github.com" target="_blank" class="hover:text-white transition">GitHub</a>
+        </div>
+        <button class="neon-btn px-6 py-2 rounded-full text-black font-bold text-sm">DOWNLOAD</button>
+    </nav>
+
+    <header class="max-w-7xl mx-auto px-8 py-24 text-center">
+        <h1 class="text-6xl md:text-8xl font-extrabold mb-6 tracking-tight">
+            Learn <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Game Hacking</span><br>the Right Way.
+        </h1>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+            A comprehensive, beginner-friendly external cheat for Counter-Strike 2. Explore kernel memory access, 3D math, and GUI implementation in C++.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button class="neon-btn px-10 py-4 rounded-xl text-black font-bold text-lg">GET SOURCE CODE</button>
+            <button class="bg-white/10 hover:bg-white/20 px-10 py-4 rounded-xl text-white font-bold text-lg transition">LEARN MORE</button>
+        </div>
+    </header>
+
+    <section id="features" class="max-w-7xl mx-auto px-8 py-24">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-10 rounded-3xl">
+                <div class="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">ESP Visualization</h3>
+                <p class="text-gray-400">Real-time box, skeleton, and health ESP using optimized 3D-to-2D projection algorithms.</p>
+            </div>
+            <div class="glass-card p-10 rounded-3xl">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Kernel Access</h3>
+                <p class="text-gray-400">Includes a skeleton KMDF driver to demonstrate safe kernel-level memory reading and writing.</p>
+            </div>
+            <div class="glass-card p-10 rounded-3xl">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Smooth Aimbot</h3>
+                <p class="text-gray-400">Customizable field-of-view (FOV) and target bone selection with smooth angle interpolation.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/5 py-12 text-center text-gray-500 text-sm">
+        <p>&copy; 2026 CS2 Beginner External Project. For educational use only.</p>
+    </footer>
+</body>
+</html>
