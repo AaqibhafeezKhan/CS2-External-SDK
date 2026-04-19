@@ -1,4 +1,4 @@
-# CS2 Beginners External Cheat
+# CS2 Beginners External Hack
 
 A simple external cheat for Counter-Strike 2, designed for beginners to learn game hacking concepts. This project does **not** include anti-cheat bypasses.
 
