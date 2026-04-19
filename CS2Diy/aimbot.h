@@ -1,6 +1,5 @@
-#pragma once
-
-
+О╩©#pragma once
+#include "cheat.h"
 
 void aimbot();
-void втцИ╤сап();
+void UpdateAimbotQueue();

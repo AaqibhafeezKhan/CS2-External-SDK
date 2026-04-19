@@ -1,4 +1,5 @@
 #include "cheat.h"
+#include <cfloat>
 
 void UpdateAimbotQueue()
 {

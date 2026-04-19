@@ -1,18 +1,16 @@
-﻿#include "myimgui.h"
+#include "myimgui.h"
 #include <Windows.h>
+#include <thread>
 
-
-
-//参数1:类名 参数2:标题名 参数3:回调 参数4:字体路径 参数5:字体大小 参数6:垂直同步 参数7:菜单样式 0为黑色,1为白色
-int myimgui::CreateWindow_Violet (LPCSTR 类名, LPCSTR title_name, myimgui::myFun fun,const char* Fontsname, float Fonts_size, bool Synclnterval, int Menustyle)
+int myimgui::CreateWindow_Violet(LPCSTR className, LPCSTR titleName, myimgui::myFun fun, const char* fontsName, float fontSize, bool syncInterval, int menuStyle)
 {
-    gamewindow.ClassName = 类名;
-    gamewindow.TitleName = title_name;
+    gamewindow.ClassName = className;
+    gamewindow.TitleName = titleName;
 
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Violet", nullptr };
     ::RegisterClassExW(&wc);
     mywindow.hwnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW,
-        wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_POPUP, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+        wc.lpszClassName, L"CS2 External SDK", WS_POPUP, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
 
     if (!myimgui::CreateDeviceD3D(mywindow.hwnd))
     {
@@ -30,23 +28,21 @@ int myimgui::CreateWindow_Violet (LPCSTR 类名, LPCSTR title_name, myimgui::myF
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;     
 
-    //菜单样式
-    if (Menustyle == 0) { ImGui::StyleColorsDark(); }
-    if (Menustyle == 1) { ImGui::StyleColorsLight(); }
+    if (menuStyle == 0) { ImGui::StyleColorsDark(); }
+    if (menuStyle == 1) { ImGui::StyleColorsLight(); }
     
     ImGui_ImplWin32_Init(mywindow.hwnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
-    ImFont* font = io.Fonts->AddFontFromFileTTF(Fontsname,Fonts_size, nullptr, io.Fonts->GetGlyphRangesChineseFull());//C:\\Windows\\Fonts\\msyh.ttc
-
+    // Optimized font loading
+    io.Fonts->AddFontFromFileTTF(fontsName, fontSize, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 
     ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 0.f);
     bool done = false;
     
-    std::thread  工具线程(作弊线程1);
+    // Start background processing thread
+    std::thread backgroundThread(CheatThread);
 
-
-    //std::thread 透视线程(透视绘制);
     while (!done)
     {
         MSG msg;
@@ -59,8 +55,9 @@ int myimgui::CreateWindow_Violet (LPCSTR 类名, LPCSTR title_name, myimgui::myF
         }
         if (done)
             exit(0);
-        //更新窗口
+
         UpdateWindow();
+
         if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
         {
             CleanupRenderTarget();
@@ -80,7 +77,8 @@ int myimgui::CreateWindow_Violet (LPCSTR 类名, LPCSTR title_name, myimgui::myF
         g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
         g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-        if (Synclnterval)
+        
+        if (syncInterval)
         {
             g_pSwapChain->Present(1, 0);
         }
@@ -89,8 +87,8 @@ int myimgui::CreateWindow_Violet (LPCSTR 类名, LPCSTR title_name, myimgui::myF
             g_pSwapChain->Present(0, 0);
         }
     }
-    
 
+    backgroundThread.detach(); // Allow thread to exit with process
 
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -102,51 +100,45 @@ int myimgui::CreateWindow_Violet (LPCSTR 类名, LPCSTR title_name, myimgui::myF
     return 0;
 }
 
-//更新窗口
 void myimgui::UpdateWindow()
 {
-    POINT Point{};
-    RECT Rect{};
+    POINT point{};
+    RECT rect{};
 
-    //查找目标窗口
     gamewindow.hwnd = FindWindowA(gamewindow.ClassName, gamewindow.TitleName);
 
-    //获取目标窗口位置
-    GetClientRect(gamewindow.hwnd, &Rect);
-    ClientToScreen(gamewindow.hwnd, &Point);
+    if (gamewindow.hwnd) {
+        GetClientRect(gamewindow.hwnd, &rect);
+        ClientToScreen(gamewindow.hwnd, &point);
 
-    //更新透明窗口位置和大小
-    mywindow.pos = gamewindow.pos = ImVec2((float)Point.x, (float)Point.y);
-    mywindow.size = gamewindow.size = ImVec2((float)Rect.right, (float)Rect.bottom);
-    SetWindowPos(mywindow.hwnd, HWND_TOPMOST, (int)mywindow.pos.x, (int)mywindow.pos.y, (int)mywindow.size.x, (int)mywindow.size.y, SWP_SHOWWINDOW);
+        mywindow.pos = gamewindow.pos = ImVec2((float)point.x, (float)point.y);
+        mywindow.size = gamewindow.size = ImVec2((float)rect.right, (float)rect.bottom);
+        
+        // Update global cheat resolution
+        cheat::screenWidth = mywindow.size.x;
+        cheat::screenHeight = mywindow.size.y;
 
-    //获取鼠标位置 同步到imgui中
-    POINT MousePos;
-    GetCursorPos(&MousePos);
-    ScreenToClient(mywindow.hwnd, &MousePos);
-    ImGui::GetIO().MousePos.x = (float)MousePos.x;
-    ImGui::GetIO().MousePos.y = (float)MousePos.y;
+        SetWindowPos(mywindow.hwnd, HWND_TOPMOST, (int)mywindow.pos.x, (int)mywindow.pos.y, (int)mywindow.size.x, (int)mywindow.size.y, SWP_SHOWWINDOW);
+    }
 
-    //鼠标穿透
+    POINT mousePos;
+    GetCursorPos(&mousePos);
+    ScreenToClient(mywindow.hwnd, &mousePos);
+    ImGui::GetIO().MousePos.x = (float)mousePos.x;
+    ImGui::GetIO().MousePos.y = (float)mousePos.y;
+
     if (ImGui::GetIO().WantCaptureMouse)
     {
-        //如果鼠标在imgui菜单区域中   那就不把他设置成分层窗口
-        //printf("WantCaptureMouse=true\n");        //0xfff7ffff 会剩下当前的属性 但是会筛掉WS_EX_LAYERED属性
         SetWindowLong(mywindow.hwnd, GWL_EXSTYLE, GetWindowLong(mywindow.hwnd, GWL_EXSTYLE) & (~WS_EX_LAYERED));
-
     }
     else
     {
-        //如果不鼠标在imgui菜单区域中  那就把他设置成分层窗口
-        //printf("WantCaptureMouse=false\n");
         SetWindowLong(mywindow.hwnd, GWL_EXSTYLE, GetWindowLong(mywindow.hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
     }
 }
 
-//创建D3D设备
 bool myimgui::CreateDeviceD3D(HWND hWnd)
 {
-    // Setup swap chain
     DXGI_SWAP_CHAIN_DESC sd;
     ZeroMemory(&sd, sizeof(sd));
     sd.BufferCount = 2;
@@ -164,11 +156,10 @@ bool myimgui::CreateDeviceD3D(HWND hWnd)
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
     UINT createDeviceFlags = 0;
-    //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
     D3D_FEATURE_LEVEL featureLevel;
     const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
     HRESULT res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_pd3dDevice, &featureLevel, &g_pd3dDeviceContext);
-    if (res == DXGI_ERROR_UNSUPPORTED) // Try high-performance WARP software driver if hardware is not available.
+    if (res == DXGI_ERROR_UNSUPPORTED)
         res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_pd3dDevice, &featureLevel, &g_pd3dDeviceContext);
     if (res != S_OK)
         return false;
@@ -177,7 +168,6 @@ bool myimgui::CreateDeviceD3D(HWND hWnd)
     return true;
 }
 
-//清理D3D设备
 void myimgui::CleanupDeviceD3D()
 {
     CleanupRenderTarget();
@@ -186,7 +176,6 @@ void myimgui::CleanupDeviceD3D()
     if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = nullptr; }
 }
 
-//创建目标渲染视图
 void myimgui::CreateRenderTarget()
 {
     ID3D11Texture2D* pBackBuffer;
@@ -195,13 +184,11 @@ void myimgui::CreateRenderTarget()
     pBackBuffer->Release();
 }
 
-//清理目标渲染视图
 void myimgui::CleanupRenderTarget()
 {
     if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = nullptr; }
 }
 
-//Win32窗口消息处理函数
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI myimgui::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -219,11 +206,11 @@ LRESULT WINAPI myimgui::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     case WM_SIZE:
         if (wParam == SIZE_MINIMIZED)
             return 0;
-        g_ResizeWidth = (UINT)LOWORD(lParam); // Queue resize
+        g_ResizeWidth = (UINT)LOWORD(lParam);
         g_ResizeHeight = (UINT)HIWORD(lParam);
         return 0;
     case WM_SYSCOMMAND:
-        if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+        if ((wParam & 0xfff0) == SC_KEYMENU)
             return 0;
         break;
     case WM_DESTROY:

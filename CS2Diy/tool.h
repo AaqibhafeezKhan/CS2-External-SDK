@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include"cheat.h"
 #include"tools/Mem.h"
 #include"output/offsets.hpp"
@@ -12,24 +12,18 @@
 #include <TlHelp32.h>
 #include <tchar.h>
 #include <psapi.h>
-using namespace cs2_dumper;
-namespace 工具 {
 
-	inline char* 指向摄像机服务的指针;
+using namespace cs2_dumper;
+
+namespace Utils {
+	inline char* pCameraServices;
 	inline char* fov;
-	inline float 初始值 = 0.f;
+	inline float InitialValue = 0.f;
 	inline char* local_player;
 
-
-
-}
-
-namespace 工具 {
 	using addr32 = unsigned int;
 	using addr64 = unsigned long long;
-}
 
-namespace 工具 {
 	class Process {
 		private:
 			unsigned short PID;
@@ -37,11 +31,11 @@ namespace 工具 {
 		public:
 			Process(unsigned short PID) : PID(PID), process_handle(OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID)) {
 				if (!process_handle)
-				throw std::runtime_error("Failed to open handle");
+					throw std::runtime_error("Failed to open handle");
 			}
 
 			Process(const TCHAR* proc_name) {
-				PID = Process::get_pid(proc_name);
+				PID = (unsigned short)Process::get_pid(proc_name);
 				if (!PID)
 					throw std::runtime_error("Unable to find process ID through process name");
 				process_handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, PID);
@@ -68,7 +62,6 @@ namespace 工具 {
 				return 0;
 			}
 
-			/*Obtain module handle through module name*/
 			LONG_PTR get_module_handle(const TCHAR* module_name) const {
 				HMODULE handles[1024]{};
 				DWORD size;
@@ -88,13 +81,12 @@ namespace 工具 {
 			T read(const Ptr& ptr) {
 				T buffer{};
 				SIZE_T t;
-			ReadProcessMemory(process_handle, (void*)ptr, &buffer, sizeof(T), &t);
-			if (t != sizeof(T))
-				throw std::runtime_error("Memory read error");
-			return buffer;
+				ReadProcessMemory(process_handle, (void*)ptr, &buffer, sizeof(T), &t);
+				if (t != sizeof(T))
+					throw std::runtime_error("Memory read error");
+				return buffer;
 			}
 
-			
 			template< typename T, typename Ptr>
 			void write(const Ptr& ptr, const T& value) {
 				T v = value;
@@ -110,8 +102,7 @@ namespace 工具 {
 	};
 }
 
-
-void 改fov角度();
-void 旋转大陀螺();
-void 作弊线程1();
-void 一直跳();
+void UpdateFOV();
+void SpinBot();
+void CheatThread();
+void BunnyHop();

@@ -10,6 +10,33 @@ void DrawESPBox() {
 	);
 }
 
+void DrawHealthBar() {
+    float healthPercentage = (float)cheat::ActorPlayer.Health / 100.0f;
+    if (healthPercentage > 1.0f) healthPercentage = 1.0f;
+    if (healthPercentage < 0.0f) healthPercentage = 0.0f;
+
+    float boxHeight = cheat::ActorPlayer.y2 - cheat::ActorPlayer.y1;
+    float barHeight = boxHeight * healthPercentage;
+
+    ImGui::GetForegroundDrawList()->AddRectFilled(
+        { cheat::ActorPlayer.x1 - 6, cheat::ActorPlayer.y2 - barHeight },
+        { cheat::ActorPlayer.x1 - 2, cheat::ActorPlayer.y2 },
+        ImColor(0, 255, 0)
+    );
+}
+
+void DrawBoneLine(char* Address, int start, int End) {
+    D3D startBone, endBone;
+    float startScreen[2], endScreen[2];
+    
+    mem::Read(gameAddress::g_handle, Address + start * 32, &startBone, 12);
+    mem::Read(gameAddress::g_handle, Address + End * 32, &endBone, 12);
+    
+    if (WorldScreen2d((float*)&startBone, startScreen) && WorldScreen2d((float*)&endBone, endScreen)) {
+        ImGui::GetForegroundDrawList()->AddLine({ startScreen[0], startScreen[1] }, { endScreen[0], endScreen[1] }, ImColor(255, 255, 255));
+    }
+}
+
 bool Update2DBox() {
 	float foot[3] = { cheat::ActorPlayer.Axis.x, cheat::ActorPlayer.Axis.y ,cheat::ActorPlayer.Axis.z };
 	float screen_foot[2];
@@ -31,18 +58,21 @@ bool Update2DBox() {
 }
 
 void DrawSkeleton() {
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 7, 6);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 6, 1);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 6, 14);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 14, 15);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 15, 16);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 6, 62);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 62, 10);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 10, 11);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 1, 26);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 26, 27);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 27, 28);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 1, 23);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 23, 24);
-    DrawBoneLine(cheat::ActorPlayer.SkeletonAddress[1], 24, 25);
+    char* address = cheat::ActorPlayer.SkeletonAddress[1];
+    if (address == nullptr) return;
+
+    DrawBoneLine(address, 7, 6);
+    DrawBoneLine(address, 6, 1);
+    DrawBoneLine(address, 6, 14);
+    DrawBoneLine(address, 14, 15);
+    DrawBoneLine(address, 15, 16);
+    DrawBoneLine(address, 6, 62);
+    DrawBoneLine(address, 62, 10);
+    DrawBoneLine(address, 10, 11);
+    DrawBoneLine(address, 1, 26);
+    DrawBoneLine(address, 26, 27);
+    DrawBoneLine(address, 27, 28);
+    DrawBoneLine(address, 1, 23);
+    DrawBoneLine(address, 23, 24);
+    DrawBoneLine(address, 24, 25);
 }

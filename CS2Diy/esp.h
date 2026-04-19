@@ -1,19 +1,3 @@
-#pragma once
-#include"cheat.h"
-#include"tools/Mem.h"
-
-namespace Í¸ÊÓ {
-	struct D2D
-	{
-		float x, y;
-	};
-}
-
-void »æÖÆ¿ò¿ò();
-bool ¼ÆËã2D·½¿ò´óĞ¡();
-Í¸ÊÓ::D2D »ñÈ¡×ó±ß¿ò();
-Í¸ÊÓ::D2D »ñÈ¡ÓÒ±ß¿ò();
-Í¸ÊÓ::D2D »ñÈ¡ÉÏ±ß¿ò();
-Í¸ÊÓ::D2D »ñÈ¡ÏÂ±ß¿ò();
-
-void »æÖÆ×ÔÊÊÓ¦·½¿ò();
+ï»¿#pragma once
+#include "cheat.h"
+#include "tools/Mem.h"
