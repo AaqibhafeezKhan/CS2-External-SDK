@@ -18,9 +18,36 @@ void fun() {
 }
 
 void Traverse() {
-    mem::Read(gameAddress::g_handle, gameAddress::clientAddress + 0x1A33E30, &cheat::Matrix, 64);
+    mem::Read(gameAddress::g_handle, gameAddress::clientAddress + cs2_dumper::offsets::client_dll::dwViewMatrix, &cheat::Matrix, 64);
 
-    for (int i = 0; i < 64; i++) {
+    uintptr_t entity_list = 0;
+    mem::Read(gameAddress::g_handle, gameAddress::clientAddress + cs2_dumper::offsets::client_dll::dwEntityList, &entity_list, 8);
+    if (!entity_list) return;
+
+    for (int i = 1; i < 64; i++) {
+        uintptr_t list_entry = 0;
+        mem::Read(gameAddress::g_handle, entity_list + (8 * (i >> 9) + 0x10), &list_entry, 8);
+        if (!list_entry) continue;
+
+        uintptr_t controller = 0;
+        mem::Read(gameAddress::g_handle, list_entry + 120 * (i & 0x1FF), &controller, 8);
+        if (!controller) continue;
+
+        uint32_t pawn_handle = 0;
+        mem::Read(gameAddress::g_handle, controller + 0x60C, &pawn_handle, 4);
+        if (!pawn_handle) continue;
+
+        uintptr_t list_entry_pawn = 0;
+        mem::Read(gameAddress::g_handle, entity_list + (8 * ((pawn_handle & 0x7FFF) >> 9) + 0x10), &list_entry_pawn, 8);
+        if (!list_entry_pawn) continue;
+
+        uintptr_t pawn = 0;
+        mem::Read(gameAddress::g_handle, list_entry_pawn + 120 * (pawn_handle & 0x1FF), &pawn, 8);
+        if (!pawn) continue;
+
+        cheat::ActorPlayer.Address[0] = (char*)controller;
+        cheat::ActorPlayer.Address[1] = (char*)pawn;
+
         if (!ReadActorPawn()) continue;
         
         if (cheat::ActorPlayer.Health <= 0) continue;
@@ -40,16 +67,30 @@ void Traverse() {
 }
 
 bool ReadLocalPawn() {
-    if (!mem::Read(gameAddress::g_handle, gameAddress::clientAddress + 0x1836BB8, &cheat::LocalPlayer.Address[0], 8)) return false;
-    mem::Read(gameAddress::g_handle, cheat::LocalPlayer.Address[0] + 0xB5C, &cheat::LocalPlayer.Health, 4);
-    mem::Read(gameAddress::g_handle, cheat::LocalPlayer.Address[0] + 0x1588, &cheat::LocalPlayer.Axis, 12);
+    if (!mem::Read(gameAddress::g_handle, gameAddress::clientAddress + cs2_dumper::offsets::client_dll::dwLocalPlayerPawn, &cheat::LocalPlayer.Address[1], 8)) return false;
+    if (!cheat::LocalPlayer.Address[1]) return false;
+
+    mem::Read(gameAddress::g_handle, cheat::LocalPlayer.Address[1] + 0x334, &cheat::LocalPlayer.Health, 4);
+    mem::Read(gameAddress::g_handle, cheat::LocalPlayer.Address[1] + 0x3CB, &cheat::LocalPlayer.camp, 1);
+    mem::Read(gameAddress::g_handle, cheat::LocalPlayer.Address[1] + 0x1274, &cheat::LocalPlayer.Axis, 12);
+    
     return true;
 }
 
 bool ReadActorPawn() {
-    // This needs proper implementation of entity list traversal
-    // For now, it's a stub that should be updated with actual logic
-    return false; 
+    if (!cheat::ActorPlayer.Address[1]) return false;
+
+    mem::Read(gameAddress::g_handle, cheat::ActorPlayer.Address[1] + 0x334, &cheat::ActorPlayer.Health, 4);
+    mem::Read(gameAddress::g_handle, cheat::ActorPlayer.Address[1] + 0x3CB, &cheat::ActorPlayer.camp, 1);
+    mem::Read(gameAddress::g_handle, cheat::ActorPlayer.Address[1] + 0x1274, &cheat::ActorPlayer.Axis, 12);
+
+    uintptr_t game_scene = 0;
+    mem::Read(gameAddress::g_handle, cheat::ActorPlayer.Address[1] + 0x318, &game_scene, 8);
+    if (game_scene) {
+        mem::Read(gameAddress::g_handle, game_scene + 0x1F0, &cheat::ActorPlayer.SkeletonAddress[1], 8);
+    }
+
+    return true;
 }
 
 bool WorldScreen2d(_In_ float world[3], _Out_ float screen[2]) {

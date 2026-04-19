@@ -1,6 +1,3 @@
-// Generated using https://github.com/a2x/cs2-dumper
-// 2026-03-16 07:21:21.899821400 UTC
-
 #pragma once
 
 #include <cstddef>
@@ -8,7 +5,6 @@
 
 namespace cs2_dumper {
     namespace offsets {
-        // Module: client.dll
         namespace client_dll {
             constexpr std::ptrdiff_t dwCSGOInput = 0x2318FC0;
             constexpr std::ptrdiff_t dwEntityList = 0x24AE268;
@@ -28,7 +24,6 @@ namespace cs2_dumper {
             constexpr std::ptrdiff_t dwViewRender = 0x230F338;
             constexpr std::ptrdiff_t dwWeaponC4 = 0x2298380;
         }
-        // Module: engine2.dll
         namespace engine2_dll {
             constexpr std::ptrdiff_t dwBuildNumber = 0x60D514;
             constexpr std::ptrdiff_t dwNetworkGameClient = 0x908520;
@@ -42,15 +37,12 @@ namespace cs2_dumper {
             constexpr std::ptrdiff_t dwWindowHeight = 0x90C8DC;
             constexpr std::ptrdiff_t dwWindowWidth = 0x90C8D8;
         }
-        // Module: inputsystem.dll
         namespace inputsystem_dll {
             constexpr std::ptrdiff_t dwInputSystem = 0x45AD0;
         }
-        // Module: matchmaking.dll
         namespace matchmaking_dll {
             constexpr std::ptrdiff_t dwGameTypes = 0x1B8000;
         }
-        // Module: soundsystem.dll
         namespace soundsystem_dll {
             constexpr std::ptrdiff_t dwSoundSystem = 0x4F3470;
             constexpr std::ptrdiff_t dwSoundSystem_engineViewData = 0x7C;

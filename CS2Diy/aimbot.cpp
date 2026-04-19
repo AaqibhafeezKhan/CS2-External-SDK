@@ -8,7 +8,7 @@ void UpdateAimbotQueue()
 	
 	if (WorldScreen2d(World, screen))
 	{
-		cheat::ActorDistance[0] = calculateDistance({ cheat::screenWidth, cheat::screenHeight }, { screen[0], screen[1] });
+		cheat::ActorDistance[0] = calculateDistance({ cheat::screenWidth / 2.0f, cheat::screenHeight / 2.0f }, { screen[0], screen[1] });
 		
 		if (cheat::ActorDistance[0] <= cheat::ActorDistance[1])
 		{
@@ -29,7 +29,7 @@ void aimbot()
 	cheat::AimAddress[1] = cheat::EnterAimAddress[1];
 	
 	int target_hp;
-	mem::Read(gameAddress::g_handle, cheat::AimAddress[0] + 0xB5C, &target_hp, 4);
+	mem::Read(gameAddress::g_handle, cheat::AimAddress[0] + 0x334, &target_hp, 4);
 	
 	if (target_hp > 0)
 	{

@@ -4,7 +4,6 @@ void UpdateFOV() {
     Utils::Process cs2(TEXT("cs2.exe"));
     
     auto client = cs2.get_module_handle(TEXT("client.dll"));
-    std::cout << XorStr("Module found: ") << client << std::endl;
     
     auto local_player = cs2.read<Utils::addr64>(client + cs2_dumper::offsets::client_dll::dwLocalPlayerPawn);
     
