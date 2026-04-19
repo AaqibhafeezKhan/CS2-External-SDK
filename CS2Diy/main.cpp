@@ -54,7 +54,7 @@ void initGame() {
 int main()
 {
 	if (!IsUserAnAdmin()) {
-		ShellExecute(NULL, L"runas", L"Cheat_v1.0.exe", NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(NULL, L"runas", L"CS2-Cheat.exe", NULL, NULL, SW_SHOWNORMAL);
 		cout << "Please run as administrator." << endl;
 		return 1;
 	}
