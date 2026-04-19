@@ -1,0 +1,84 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3
+
+    - name: Build User-mode Cheat (CS2Diy)
+      run: |
+        msbuild DiyCS2.sln /p:Configuration=Release /p:Platform=x64 /t:CS2Diy
+
+    - name: Build Kernel-mode Driver (KMDF Driver1)
+      # Note: This might fail if WDK is not present on the runner.
+      # We attempt it but continue on error to at least release the user-mode part if needed.
+      continue-on-error: true
+      run: |
+        msbuild DiyCS2.sln /p:Configuration=Release /p:Platform=x64 /t:"KMDF Driver1"
+
+    - name: Prepare Release Artifacts
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Force -Path release_files
+        
+        # Copy User-mode binary
+        if (Test-Path "x64\Release\CS2-Cheat.exe") {
+            Copy-Item "x64\Release\CS2-Cheat.exe" -Destination "release_files\CS2-Cheat.exe"
+        } elseif (Test-Path "CS2Diy\x64\Release\CS2-Cheat.exe") {
+            Copy-Item "CS2Diy\x64\Release\CS2-Cheat.exe" -Destination "release_files\CS2-Cheat.exe"
+        } else {
+            Write-Warning "User-mode binary not found in expected locations."
+        }
+        
+        # Copy Driver binary
+        if (Test-Path "x64\Release\CS2-Driver.sys") {
+            Copy-Item "x64\Release\CS2-Driver.sys" -Destination "release_files\CS2-Driver.sys"
+        } elseif (Test-Path "KMDF Driver1\x64\Release\CS2-Driver.sys") {
+            Copy-Item "KMDF Driver1\x64\Release\CS2-Driver.sys" -Destination "release_files\CS2-Driver.sys"
+        } else {
+            Write-Warning "Driver binary not found."
+        }
+        
+        Compress-Archive -Path release_files\* -DestinationPath CS2-External-SDK-Release.zip
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: CS2-External-SDK-Release.zip
+        body: |
+          ## CS2 External SDK Release
+          
+          This release includes the compiled binaries for the user-mode cheat and the kernel-mode driver.
+          
+          ### Included Files:
+          - `CS2-Cheat.exe`: The main external cheat application.
+          - `CheatDriver.sys`: (Optional) Kernel driver for memory access.
+          
+          ### Usage:
+          1. Ensure CS2 is running.
+          2. Run `CS2-Cheat.exe` as Administrator.
+          3. Use the Insert key to toggle the menu.
+          
+          *Note: If the driver was not included in this build, the cheat will use standard user-mode memory access if supported.*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
